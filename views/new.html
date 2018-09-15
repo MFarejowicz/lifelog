@@ -1,6 +1,37 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<h1>LifeLog!</h1>
-<h2>Track a New Project</h2>
+  <div>
+    <h2>Track a New Project</h2>
+    <div>
+      <label>Enter project name:</label>
+      <input id="proj-name" type="text">
+    </div>
+    <div>
+      <label>Enter project description:</label>
+      <textarea id="proj-desc" rows="1"></textarea>
+    </div>
+    <div>
+      <label>Enter deadline:</label>
+      <input id="proj-deadline" type="date">
+    </div>
+    <div>
+      <label>Enter current progress:</label>
+      <input id="proj-prog" type="text" disabled>
+    </div>
+    <div>
+      <label>Enter project picture:</label>
+      <input id="proj-pic" type="image" disabled>
+    </div>
+    <div>
+      <label>Enter project collaborators:</label>
+      <input id="proj-collab" type="text" disabled>
+    </div>
+    <div>
+      <label>Enter project tags:</label>
+      <input id="proj-tags" type="text" disabled>
+    </div>
+    <button id="create">Create project page</button>
+  </div>
+  <script type="text/javascript" src="/static/new.js" defer></script>
 {% endblock %}

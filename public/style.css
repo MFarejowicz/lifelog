@@ -1,3 +1,20 @@
-body {
-  font-size: 20px;
+html, body {
+  font-family: sans-serif;
+  padding: 0;
+  margin: 0;
+}
+
+p {
+  padding: 0;
+  margin: 0;
+}
+
+.middle {
+  width: 60%;
+  margin: auto;
+}
+
+.proj-card {
+  border: 2px solid black;
+  margin: 5px 0; 
 }

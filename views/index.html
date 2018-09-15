@@ -1,6 +1,16 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<h1>LifeLog!</h1>
-<h2>Popular Projects</h2>
+  <div class="middle">
+    <h2>Popular Projects</h2>
+    {% for project in projects %}
+      <div class="proj-card">
+        <p class="proj-card-name">{{ project.name }}</p>
+        <span class="proj-card-description">{{ project.description }}</p>
+      </div>
+      {% else %}
+      <li>No current projects</li>
+    {% endfor %}
+  </div>
+  <script type="text/javascript" src="/static/index.js" defer></script>
 {% endblock %}
