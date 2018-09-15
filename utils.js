@@ -1,12 +1,12 @@
 const mysql = require('mysql');
-const credentials = require('./credentials');
+const { dbCredentials } = require('./credentials');
 
 // Connect to the database
 const connection = mysql.createConnection({
-	host: credentials.host,
-	user: credentials.user,
-	password: credentials.password,
-	database: credentials.database
+	host: dbCredentials.host,
+	user: dbCredentials.user,
+	password: dbCredentials.password,
+	database: dbCredentials.database
 });
 
 const noParamQuery = (dbRequest) => {

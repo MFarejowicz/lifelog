@@ -1,6 +1,13 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<h2>Project {{ projectId }}</h2>
-<script type="text/javascript" src="/static/project.js" defer></script>
+  {% if project %}
+    <h2>{{ project.name }}</h2>
+    <h4>Owner(s): -</h4>
+    <h4>Description: {{ project.description }}</h4>
+    <h4>Projected Deadline: {{ project.deadline }}</h4>
+  {% else %}
+    <h2>This project does not exist yet.</h2>
+  {% endif %}
+  <script type="text/javascript" src="/static/project.js" defer></script>
 {% endblock %}

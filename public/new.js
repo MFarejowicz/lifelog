@@ -1,3 +1,10 @@
+function parseDate(s) {
+  const b = s.split(/\D/);
+  const d = new Date(b[0], --b[1], b[2]);
+  const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+  return d.toLocaleDateString('en-US', options);
+}
+
 function bindCreate() {
   const createButton = document.getElementById('create');
   createButton.onclick = () => {
@@ -6,7 +13,7 @@ function bindCreate() {
     const descInput = document.getElementById('proj-desc');
     const desc = descInput.value;
     const deadlineInput = document.getElementById('proj-deadline');
-    const deadline = deadlineInput.value;
+    const deadline = parseDate(deadlineInput.value);
     axios.post('/createproject', { name, desc, deadline })
     .then((res) => {
       if (res.data.redirect) {

@@ -30,7 +30,14 @@ app.get('/', function(req, res) {
 });
 
 app.get('/project/:project', function(req, res) {
-  res.render('project.html', { projectId: req.params.project });
+  utils.paramQuery('SELECT * FROM projects WHERE projectId = ?', req.params.project)
+  .then((results) => {
+    const dbHit = results[0];
+    res.render('project.html', { project: dbHit });
+  })
+  .catch((err) => {
+    console.log(err);
+  });
 });
 
 app.get('/me', function(req, res) {
