@@ -12,7 +12,10 @@
     <script type="text/javascript" src="/static/base.js" defer></script>
   </head>
   <body>
-    <h1 id="title">LifeLog!</h1>
+    <div style="display: flex; justify-content: space-between">
+      <h1 id="title">LifeLog!</h1>
+      <a href="/auth/google/callback">Log In</a>
+    </div>
     {% block content %}{% endblock %}
   </body>
 </html>
