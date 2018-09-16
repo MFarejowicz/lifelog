@@ -3,9 +3,30 @@
 {% block content %}
   {% if project %}
     <h2>{{ project.name }}</h2>
-    <h4>Owner(s): -</h4>
+    <span id="proj-id" style="display:none">{{ project.projectId }}</span>
+    <h4>Owner(s): {{ ownerNames }}</h4>
     <h4>Description: {{ project.description }}</h4>
     <h4>Projected Deadline: {{ project.deadline }}</h4>
+    <h4>Project Progress:</h4>
+    {% for update in updates | reverse() %}
+      <div class="update-card">
+        <li>
+          <span class="update-card-time">{{ update.timeStamp }} - </span>
+          <span class="update-card-poster">{{ update.fkUserName }}: </span>
+          <span class="update-card-content">{{ update.content }}</span>
+        </li>
+      </div>
+      {% else %}
+      <li>No current updates</li>
+    {% endfor %}
+    {% if isOwner %}
+    <br/>
+    <div>
+      <label>Post project update:</label>
+      <textarea id="proj-update" rows="3"></textarea>
+      <button onclick={{"postUpdate(" + project.projectId + ")"}} id="post-update">Post!</button>
+    </div>
+    {% endif %}
   {% else %}
     <h2>This project does not exist yet.</h2>
   {% endif %}

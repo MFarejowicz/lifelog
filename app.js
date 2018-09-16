@@ -70,10 +70,21 @@ app.get('/', function(req, res) {
 });
 
 app.get('/project/:project', function(req, res) {
-  utils.paramQuery('SELECT * FROM projects WHERE projectId = ?', req.params.project)
+  Promise.all([
+    utils.paramQuery('SELECT * FROM projects WHERE projectId = ?', req.params.project),
+    utils.paramQuery('SELECT fkUserId, fkUserName FROM projectsUsers WHERE fkProjectId = ?', req.params.project),
+    utils.paramQuery('SELECT * FROM updates WHERE fkProjectId=?', req.params.project)
+  ])
   .then((results) => {
-    const dbHit = results[0];
-    res.render('project.html', {project: dbHit, loggedIn: req.isAuthenticated()});
+    const dbHit = results[0][0];
+    const ownerList = results[1];
+    const ownerNames = ownerList.map(el => el.fkUserName)
+    let isOwner = false;
+    if (req.user) {
+      isOwner = ownerList.some(el => el.fkUserId === req.user.id);
+    }
+    const updates = results[2];
+    res.render('project.html', {project: dbHit, updates, ownerNames, isOwner, loggedIn: req.isAuthenticated()});
   })
   .catch((err) => {
     console.log(err);
@@ -100,7 +111,7 @@ app.get('/new', function(req, res) {
 
 app.post('/createproject', function(req, res) {
   const timeStamp = new Date().toString();
-  const values  = {
+  const values = {
     createTime: timeStamp,
     name: req.body.name,
     description: req.body.desc,
@@ -108,14 +119,31 @@ app.post('/createproject', function(req, res) {
   };
   utils.paramQuery('INSERT INTO projects SET ?', values)
   .then((results) => {
-    const pair = [results.insertId, req.user.id];
-    utils.paramQuery('INSERT INTO projectsUsers VALUES (?)', [pair])
+    const ownerInfo = [results.insertId, req.user.id, req.user.displayName];
+    utils.paramQuery('INSERT INTO projectsUsers VALUES (?)', [ownerInfo])
     res.send({ redirect: `/project/${results.insertId}` })
   })
   .catch((err) => {
     console.log(err);
   });
-  // utils.paramQuery('INSERT INTO projectsUsers VALUES (?)', pair)
+});
+
+app.post('/postupdate', function(req, res) {
+  const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+  const timeStamp = new Date().toLocaleDateString('en-US', options);
+  const values = {
+    fkProjectId: req.body.projectId,
+    fkUserName: req.user.displayName,
+    timeStamp,
+    content: req.body.content,
+  }
+  utils.paramQuery('INSERT INTO updates SET ?', values)
+  .then((results) => {
+    res.send('success');
+  })
+  .catch((err) => {
+    console.log(err);
+  });
 });
 
 app.listen(3000, () => console.log('Test app listening on port 3000!'));
