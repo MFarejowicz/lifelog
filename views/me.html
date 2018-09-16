@@ -2,7 +2,7 @@
 
 {% block content %}
 <div class="middle">
-  <h2>My Projects</h2>
+  <h2 class="page-title">My Projects</h2>
   {% if loggedIn %}
     {% for project in projects %}
       <div class="proj-card">
@@ -18,7 +18,7 @@
       <a href="/new"><p>+ Track a new project</p></a>
     </div>
   {% else %}
-    <p>You are not currently logged in</p>
+    <p><a class="login-text" href="/auth/google/callback">Log in</a> to view your projects.</p>
   {% endif %}
 </div>
 <script type="text/javascript" src="/static/me.js" defer></script>

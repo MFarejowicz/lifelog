@@ -1,35 +1,52 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<div class="middle">
-  {% if project %}
-    <h2 class="page-title">{{ project.name }}</h2>
-    <span id="proj-id" style="display:none">{{ project.projectId }}</span>
-    <h4>Owner(s): {{ ownerNames }}</h4>
-    <h4>Description: {{ project.description }}</h4>
-    <h4>Projected Deadline: {{ project.deadline }}</h4>
-    <h4>Project Progress:</h4>
-    {% if isOwner %}
-      <br/>
-      <div>
-        <label>Post project update:</label>
-        <textarea id="proj-update" rows="3"></textarea>
-        <button onclick={{"postUpdate(" + project.projectId + ")"}} id="post-update">Post!</button>
+  <div class="middle">
+    {% if project %}
+      <h2 class="page-title">{{ project.name }}</h2>
+      <div class="proj-container">
+        <div class="proj-left">
+          <div style="margin-bottom: 4px">
+            <span style="font-weight: bold">Owner(s): </span>
+            <span>{{ ownerNames }}</span>
+          </div>
+          {% if project.description %}
+          <div style="margin-bottom: 4px">
+            <span style="font-weight: bold">Description: </span>
+            <span>{{ project.description }}</span>
+          </div>
+          {% endif %}
+          {% if project.deadline %}
+          <div style="margin-bottom: 4px">
+            <span style="font-weight: bold">Projected Deadline: </span>
+            <span>{{ project.deadline }}</span>
+          </div>
+          {% endif %}
+        </div>
+        <div class="proj-right">
+        <h4>Project Progress:</h4>
+        {% for update in updates | reverse() %}
+          <div class="update-card">
+            <li>
+              <span class="update-card-time">{{ update.timeStamp }} - </span>
+              <span class="update-card-poster">{{ update.fkUserName }}: </span>
+              <span class="update-card-content">{{ update.content }}</span>
+            </li>
+          </div>
+          {% else %}
+          <li>No current updates</li>
+        {% endfor %}
+        {% if isOwner %}
+          <div style="display: flex; align-items: center; margin-top: 6px">
+            <label>Post project update:</label>
+            <textarea id="proj-update" rows="1" cols="70"></textarea>
+            <button onclick={{"postUpdate(" + project.projectId + ")"}} id="post-update">Post!</button>
+          </div>
+        {% endif %}
+        </div>
       </div>
-    {% endif %}
-    {% for update in updates | reverse() %}
-      <div class="update-card">
-        <li>
-          <span class="update-card-time">{{ update.timeStamp }} - </span>
-          <span class="update-card-poster">{{ update.fkUserName }}: </span>
-          <span class="update-card-content">{{ update.content }}</span>
-        </li>
-      </div>
-      {% else %}
-      <li>No current updates</li>
-    {% endfor %}
-    {% if (projectComments | length) > 0 %}
       <h4>Project Comments:</h4>
+      <div style="margin-bottom: 6px">
       {% for comment in projectComments %}
         <div class="p-comments-card">
           <li>
@@ -38,21 +55,22 @@
             <span class="p-comments-card-content">{{ comment.comment }}</span>
           </li>
         </div>
+      {% else %}
+      <li>No current comments</li>
       {% endfor %}
-    {% endif %}
-    {% if loggedIn %}
-      <br/>
-      <div>
-        <label>Comment on the project:</label>
-        <textarea id="proj-comment" rows="3"></textarea>
-        <button onclick={{"postProjectComment(" + project.projectId + ")"}} id="post-proj-comment">Comment!</button>
       </div>
+      {% if loggedIn %}
+        <div style="display: flex; align-items: center">
+          <label>Comment on the project:</label>
+          <textarea id="proj-comment" rows="1" cols="70"></textarea>
+          <button onclick={{"postProjectComment(" + project.projectId + ")"}} id="post-proj-comment">Comment!</button>
+        </div>
+      {% else %}
+        <p>Log in to comment on the project</p>
+      {% endif %}
     {% else %}
-      <p>Log in to comment on the project</p>
+      <h2>This project does not exist yet.</h2>
     {% endif %}
-  {% else %}
-    <h2>This project does not exist yet.</h2>
-  {% endif %}
-</div>
+  </div>
   <script type="text/javascript" src="/static/project.js" defer></script>
 {% endblock %}

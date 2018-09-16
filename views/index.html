@@ -3,16 +3,23 @@
 {% block content %}
   <div class="middle">
     <h2 class="page-title">Popular Projects</h2>
-    {% for project in projects %}
+    {% for project in projects | reverse() %}
       <div class="proj-card">
         <a href={{"/project/" + project.projectId}}>
           <p class="proj-card-name">{{ project.name }}</p>
+          {% if project.description %}
           <p class="proj-card-description">{{ project.description }}</p>
+          {% endif %}
         </a>
       </div>
       {% else %}
       <li>No current projects</li>
     {% endfor %}
   </div>
+  {% if loggedIn %}
+  <div class="home-new">
+    <a href="/new"><p>+ Track a new project</p></a>
+  </div>
+  {% endif %}
   <script type="text/javascript" src="/static/index.js" defer></script>
 {% endblock %}

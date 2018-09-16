@@ -14,6 +14,11 @@ a {
   color: inherit;
 }
 
+li {
+  padding-left: 1.3em;
+  text-indent: -1.3em;
+}
+
 .header-bar {
   background-color: #393E42;
   color: #e5e5e5;
@@ -54,6 +59,22 @@ a {
   color: #b2b2b2;
 }
 
+.login-text {
+  text-decoration: underline;
+}
+
+.login-text:hover {
+  color: #717171;
+}
+
+.home-new {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  border: 1px solid black;
+  padding: 4px;
+}
+
 .proj-card {
   border: 2px solid black;
   margin: 10px;
@@ -67,4 +88,42 @@ a {
 .proj-card-name {
   font-size: 26px;
   font-weight: bold;
+}
+
+.create-prompt {
+  margin: 4px 0;
+}
+
+.create-input-field {
+  display: flex;
+  align-items: center;
+  margin: 4px 10px;
+}
+
+.create-input-field label {
+  margin-right: 4px;
+}
+
+#create {
+  margin: 4px 10px;
+  font-size: 20px;
+}
+
+.proj-container {
+  display: flex;
+  margin-bottom: 50px;
+}
+
+.proj-left {
+  flex: 1;
+  border-right: 1px solid black;
+}
+
+.proj-right {
+  flex: 3;
+  margin-left: 4px;
+}
+
+#proj-update, #proj-comment {
+  margin: 0 2px;
 }

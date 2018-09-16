@@ -116,8 +116,8 @@ app.post('/createproject', function(req, res) {
   const values = {
     createTime: timeStamp,
     name: req.body.name,
-    description: req.body.desc,
-    deadline: req.body.deadline,
+    description: req.body.desc || null,
+    deadline: req.body.deadline || null,
   };
   utils.paramQuery('INSERT INTO projects SET ?', values)
   .then((results) => {

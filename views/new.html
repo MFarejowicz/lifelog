@@ -2,39 +2,40 @@
 
 {% block content %}
   <div class="middle">
-    <h2>Track a New Project</h2>
+    <h2 class="page-title">Track a New Project</h2>
     {% if loggedIn %}
-      <div>
-        <label>Enter project name:</label>
+      <h4 class="create-prompt">Please enter the following information about the project you'd like to track:</h5>
+      <div class="create-input-field">
+        <label>Project name:</label>
         <input id="proj-name" type="text">
       </div>
-      <div>
-        <label>Enter project description:</label>
+      <div class="create-input-field">
+        <label>Project description:</label>
         <textarea id="proj-desc" rows="1"></textarea>
       </div>
-      <div>
-        <label>Enter deadline:</label>
+      <div class="create-input-field">
+        <label>Projected Deadline (optional):</label>
         <input id="proj-deadline" type="date">
       </div>
-      <div>
-        <label>Enter current progress:</label>
+      <div class="create-input-field">
+        <label>Current progress (optional):</label>
         <input id="proj-prog" type="text" disabled>
       </div>
-      <div>
-        <label>Enter project picture:</label>
+      <div class="create-input-field">
+        <label>Picture (optional):</label>
         <input id="proj-pic" type="image" disabled>
       </div>
-      <div>
-        <label>Enter project collaborators:</label>
+      <div class="create-input-field">
+        <label>Collaborators (optional):</label>
         <input id="proj-collab" type="text" disabled>
       </div>
-      <div>
-        <label>Enter project tags:</label>
+      <div class="create-input-field">
+        <label>Tags (optional):</label>
         <input id="proj-tags" type="text" disabled>
-      </div>
+      </div class="create-input-field">
       <button onclick="createProject()" id="create">Create project page</button>
     {% else %}
-      <p>You must be logged in to create a project page</p>
+      <p>You must be <a class="login-text" href="/auth/google/callback">logged in</a> to create a project page.</p>
     {% endif %}
   </div>
   <script type="text/javascript" src="/static/new.js" defer></script>
