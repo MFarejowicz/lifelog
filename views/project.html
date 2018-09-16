@@ -1,13 +1,22 @@
 {% extends 'base.html' %}
 
 {% block content %}
+<div class="middle">
   {% if project %}
-    <h2>{{ project.name }}</h2>
+    <h2 class="page-title">{{ project.name }}</h2>
     <span id="proj-id" style="display:none">{{ project.projectId }}</span>
     <h4>Owner(s): {{ ownerNames }}</h4>
     <h4>Description: {{ project.description }}</h4>
     <h4>Projected Deadline: {{ project.deadline }}</h4>
     <h4>Project Progress:</h4>
+    {% if isOwner %}
+      <br/>
+      <div>
+        <label>Post project update:</label>
+        <textarea id="proj-update" rows="3"></textarea>
+        <button onclick={{"postUpdate(" + project.projectId + ")"}} id="post-update">Post!</button>
+      </div>
+    {% endif %}
     {% for update in updates | reverse() %}
       <div class="update-card">
         <li>
@@ -19,16 +28,31 @@
       {% else %}
       <li>No current updates</li>
     {% endfor %}
-    {% if isOwner %}
-    <br/>
-    <div>
-      <label>Post project update:</label>
-      <textarea id="proj-update" rows="3"></textarea>
-      <button onclick={{"postUpdate(" + project.projectId + ")"}} id="post-update">Post!</button>
-    </div>
+    {% if (projectComments | length) > 0 %}
+      <h4>Project Comments:</h4>
+      {% for comment in projectComments %}
+        <div class="p-comments-card">
+          <li>
+            <span class="p-comments-card-time">{{ comment.timeStamp }} - </span>
+            <span class="p-comments-card-poster">{{ comment.fkUserName }}: </span>
+            <span class="p-comments-card-content">{{ comment.comment }}</span>
+          </li>
+        </div>
+      {% endfor %}
+    {% endif %}
+    {% if loggedIn %}
+      <br/>
+      <div>
+        <label>Comment on the project:</label>
+        <textarea id="proj-comment" rows="3"></textarea>
+        <button onclick={{"postProjectComment(" + project.projectId + ")"}} id="post-proj-comment">Comment!</button>
+      </div>
+    {% else %}
+      <p>Log in to comment on the project</p>
     {% endif %}
   {% else %}
     <h2>This project does not exist yet.</h2>
   {% endif %}
+</div>
   <script type="text/javascript" src="/static/project.js" defer></script>
 {% endblock %}

@@ -2,7 +2,7 @@
 
 {% block content %}
   <div class="middle">
-    <h2>Popular Projects</h2>
+    <h2 class="page-title">Popular Projects</h2>
     {% for project in projects %}
       <div class="proj-card">
         <a href={{"/project/" + project.projectId}}>

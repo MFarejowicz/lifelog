@@ -9,12 +9,62 @@ p, h1, h2, h3, h4, h5, h6 {
   margin: 0;
 }
 
+a {
+  text-decoration: none;
+  color: inherit;
+}
+
+.header-bar {
+  background-color: #393E42;
+  color: #e5e5e5;
+  height: 50px;
+  display: flex;
+  align-items: center;
+}
+
+.header {
+  display: flex;
+  width: 80%;
+  margin: auto;
+  justify-content: space-between;
+  align-items: center;
+}
+
+#super-title {
+  cursor: pointer;
+}
+
 .middle {
   width: 60%;
   margin: auto;
 }
 
+.page-title {
+  font-size: 32px;
+  margin: 5px 0;
+}
+
+.login-button, .myproj-button {
+  color: #e5e5e5;
+  font-size: 20px;
+  text-decoration: underline;
+}
+
+.login-button:hover, .myproj-button:hover {
+  color: #b2b2b2;
+}
+
 .proj-card {
   border: 2px solid black;
-  margin: 5px 0;
+  margin: 10px;
+  padding: 10px;
+}
+
+.proj-card:hover {
+  transform: scale(1.02, 1.02);
+}
+
+.proj-card-name {
+  font-size: 26px;
+  font-weight: bold;
 }

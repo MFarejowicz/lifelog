@@ -12,13 +12,15 @@
     <script type="text/javascript" src="/static/base.js" defer></script>
   </head>
   <body>
-    <div style="display: flex; justify-content: space-between">
-      <h1 id="title">LifeLog!</h1>
-      {% if loggedIn %}
-        <a href="/me">My projects</a>
-      {% else %}
-        <a href="/auth/google/callback">Log In</a>
-      {% endif %}
+    <div class="header-bar">
+      <div class="header">
+        <h1 id="super-title">LifeLog!</h1>
+        {% if loggedIn %}
+          <a class="myproj-button" href="/me">My Projects</a>
+        {% else %}
+          <a class="login-button" href="/auth/google/callback">Log In</a>
+        {% endif %}
+      </div>
     </div>
     {% block content %}{% endblock %}
   </body>

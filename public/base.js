@@ -1,6 +1,6 @@
 function init() {
-  const title = document.getElementById('title');
-  title.onclick = () => {
+  const superTitle = document.getElementById('super-title');
+  superTitle.onclick = () => {
     document.location.href = '/';
   }
 };

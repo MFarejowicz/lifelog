@@ -73,7 +73,8 @@ app.get('/project/:project', function(req, res) {
   Promise.all([
     utils.paramQuery('SELECT * FROM projects WHERE projectId = ?', req.params.project),
     utils.paramQuery('SELECT fkUserId, fkUserName FROM projectsUsers WHERE fkProjectId = ?', req.params.project),
-    utils.paramQuery('SELECT * FROM updates WHERE fkProjectId=?', req.params.project)
+    utils.paramQuery('SELECT * FROM updates WHERE fkProjectId=?', req.params.project),
+    utils.paramQuery('SELECT * FROM projectComments WHERE fkProjectId=?', req.params.project),
   ])
   .then((results) => {
     const dbHit = results[0][0];
@@ -84,7 +85,8 @@ app.get('/project/:project', function(req, res) {
       isOwner = ownerList.some(el => el.fkUserId === req.user.id);
     }
     const updates = results[2];
-    res.render('project.html', {project: dbHit, updates, ownerNames, isOwner, loggedIn: req.isAuthenticated()});
+    const projectComments = results[3];
+    res.render('project.html', {project: dbHit, updates, ownerNames, isOwner, projectComments, loggedIn: req.isAuthenticated()});
   })
   .catch((err) => {
     console.log(err);
@@ -129,8 +131,7 @@ app.post('/createproject', function(req, res) {
 });
 
 app.post('/postupdate', function(req, res) {
-  const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-  const timeStamp = new Date().toLocaleDateString('en-US', options);
+  const timeStamp = new Date().toLocaleString('en-US');
   const values = {
     fkProjectId: req.body.projectId,
     fkUserName: req.user.displayName,
@@ -138,6 +139,24 @@ app.post('/postupdate', function(req, res) {
     content: req.body.content,
   }
   utils.paramQuery('INSERT INTO updates SET ?', values)
+  .then((results) => {
+    res.send('success');
+  })
+  .catch((err) => {
+    console.log(err);
+  });
+});
+
+app.post('/postprojectcomment', function(req, res) {
+  // const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+  const timeStamp = new Date().toLocaleString('en-US');
+  const values = {
+    fkProjectId: req.body.projectId,
+    fkUserName: req.user.displayName,
+    timeStamp,
+    comment: req.body.projectComment,
+  }
+  utils.paramQuery('INSERT INTO projectComments SET ?', values)
   .then((results) => {
     res.send('success');
   })
