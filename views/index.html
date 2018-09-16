@@ -5,8 +5,10 @@
     <h2>Popular Projects</h2>
     {% for project in projects %}
       <div class="proj-card">
-        <p class="proj-card-name">{{ project.name }}</p>
-        <span class="proj-card-description">{{ project.description }}</p>
+        <a href={{"/project/" + project.projectId}}>
+          <p class="proj-card-name">{{ project.name }}</p>
+          <p class="proj-card-description">{{ project.description }}</p>
+        </a>
       </div>
       {% else %}
       <li>No current projects</li>

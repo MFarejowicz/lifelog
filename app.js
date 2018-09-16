@@ -4,9 +4,9 @@ const bodyParser = require('body-parser');
 const nunjucks = require('nunjucks');
 const passport = require('passport');
 const GoogleStrategy = require('passport-google-oauth20').Strategy;
+const { googleCredentials } = require('./credentials');
 const session = require('express-session');
 const utils = require('./utils');
-const { googleCredentials } = require('./credentials');
 
 const app = express();
 
@@ -52,7 +52,7 @@ passport.deserializeUser((userDataFromCookie, done) => {
 });
 
 app.get('/auth/google/callback',
-  passport.authenticate('google', { failureRedirect: '/', session: true}),
+  passport.authenticate('google', { successRedirect : 'back', failureRedirect: 'back', session: true}),
   function (req, res) {
     console.log('Here is our user object:', req.user);
     res.redirect('/');
@@ -62,7 +62,7 @@ app.get('/auth/google/callback',
 app.get('/', function(req, res) {
   utils.noParamQuery('SELECT * FROM projects')
   .then((results) => {
-    res.render('index.html', {projects: results});
+    res.render('index.html', {projects: results, loggedIn: req.isAuthenticated()});
   })
   .catch((err) => {
     console.log(err);
@@ -73,7 +73,7 @@ app.get('/project/:project', function(req, res) {
   utils.paramQuery('SELECT * FROM projects WHERE projectId = ?', req.params.project)
   .then((results) => {
     const dbHit = results[0];
-    res.render('project.html', { project: dbHit });
+    res.render('project.html', {project: dbHit, loggedIn: req.isAuthenticated()});
   })
   .catch((err) => {
     console.log(err);
@@ -81,11 +81,21 @@ app.get('/project/:project', function(req, res) {
 });
 
 app.get('/me', function(req, res) {
-  res.render('me.html');
+  if (req.isAuthenticated()) {
+    utils.paramQuery('SELECT projects.* FROM projectsUsers JOIN projects ON fkProjectId=projectId WHERE fkUserId = ?', req.user.id)
+    .then((results) => {
+      res.render('me.html', {projects: results, loggedIn: true});
+    })
+    .catch((err) => {
+      console.log(err);
+    });
+  } else {
+    res.render('me.html', {loggedIn: false});
+  }
 });
 
 app.get('/new', function(req, res) {
-  res.render('new.html');
+  res.render('new.html', {loggedIn: req.isAuthenticated()});
 });
 
 app.post('/createproject', function(req, res) {
@@ -98,11 +108,14 @@ app.post('/createproject', function(req, res) {
   };
   utils.paramQuery('INSERT INTO projects SET ?', values)
   .then((results) => {
+    const pair = [results.insertId, req.user.id];
+    utils.paramQuery('INSERT INTO projectsUsers VALUES (?)', [pair])
     res.send({ redirect: `/project/${results.insertId}` })
   })
   .catch((err) => {
     console.log(err);
   });
+  // utils.paramQuery('INSERT INTO projectsUsers VALUES (?)', pair)
 });
 
 app.listen(3000, () => console.log('Test app listening on port 3000!'));

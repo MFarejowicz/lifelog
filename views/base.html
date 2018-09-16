@@ -14,7 +14,11 @@
   <body>
     <div style="display: flex; justify-content: space-between">
       <h1 id="title">LifeLog!</h1>
-      <a href="/auth/google/callback">Log In</a>
+      {% if loggedIn %}
+        <a href="/me">My projects</a>
+      {% else %}
+        <a href="/auth/google/callback">Log In</a>
+      {% endif %}
     </div>
     {% block content %}{% endblock %}
   </body>

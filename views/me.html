@@ -1,6 +1,25 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<h2>My Projects</h2>
+<div class="middle">
+  <h2>My Projects</h2>
+  {% if loggedIn %}
+    {% for project in projects %}
+      <div class="proj-card">
+        <a href={{"/project/" + project.projectId}}>
+          <p class="proj-card-name">{{ project.name }}</p>
+          <p class="proj-card-description">{{ project.description }}</p>
+        </a>
+      </div>
+      {% else %}
+      <li>No current projects</li>
+    {% endfor %}
+    <div class="proj-card">
+      <a href="/new">+ Track a new project</a>
+    </div>
+  {% else %}
+    <p>You are not currently logged in</p>
+  {% endif %}
+</div>
 <script type="text/javascript" src="/static/me.js" defer></script>
 {% endblock %}
