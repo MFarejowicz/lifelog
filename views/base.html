@@ -15,10 +15,16 @@
     <div class="header-bar">
       <div class="header">
         <h1 id="super-title">LifeLog!</h1>
+        <div id="search-bar">
+          <input id="search" type="text" placeholder="Search for a project...">
+        </div>
         {% if loggedIn %}
-          <a class="myproj-button" href="/me">My Projects</a>
+          <div>
+            <a id="myproj-button" class="l-button" href="/me">My Projects</a>
+            <a id="logout-button" class="l-button" href="/">Log Out</a>
+          </div>
         {% else %}
-          <a class="login-button" href="/auth/google/callback">Log In</a>
+          <a id="login-button" class="l-button" href="/auth/google/callback">Log In</a>
         {% endif %}
       </div>
     </div>

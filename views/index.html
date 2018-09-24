@@ -3,21 +3,43 @@
 {% block content %}
   <div class="middle">
     <h2 class="page-title">Popular Projects</h2>
+    {% set looping = true %}
     {% for project in projects | reverse() %}
-      <div class="proj-card">
-        <a href={{"/project/" + project.projectId}}>
-          <p class="proj-card-name">{{ project.name }}</p>
-          {% if project.description %}
-          <p class="proj-card-description">{{ project.description }}</p>
-          {% endif %}
-        </a>
-      </div>
+      {% if looping %}
+        <div class="proj-card">
+          <a href={{"/project/" + project.projectId}}>
+            <p class="proj-card-name">{{ project.name }}</p>
+            {% if project.description %}
+            <p class="proj-card-description">{{ project.description }}</p>
+            {% endif %}
+          </a>
+        </div>
+        {% if loop.index == 6 %}
+          {% set looping = false %}
+        {% endif %}
+      {% endif %}
       {% else %}
       <li>No current projects</li>
     {% endfor %}
+    <h4 class="page-subtitle">About LifeLog</h4>
+    <p>
+      Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec mollis
+      pulvinar ipsum, sed viverra mauris ultricies tempor. Phasellus lacinia,
+      orci sed tristique aliquam, leo tellus hendrerit nisl, eget pellentesque
+      ipsum lorem ac elit. Nam lobortis nisi id luctus placerat. Ut accumsan
+      diam elit. Nunc convallis aliquet ex, quis fermentum risus tristique eget.
+      Etiam dapibus vitae orci feugiat lobortis. Donec tempus scelerisque
+      interdum. Duis bibendum felis in massa euismod, quis pulvinar eros posuere.
+      Proin placerat accumsan condimentum. Proin eleifend feugiat metus
+      pulvinar vehicula.
+    </p>
+    <br/>
+    <p>
+      Created by Matt Farejowicz at HackMIT 2018 (and a little bit after).
+    </p>
   </div>
   {% if loggedIn %}
-  <div class="home-new">
+  <div id="home-new" class="l-button">
     <a href="/new"><p>+ Track a new project</p></a>
   </div>
   {% endif %}

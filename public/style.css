@@ -19,6 +19,15 @@ li {
   text-indent: -1.3em;
 }
 
+input:focus {
+  outline:none;
+}
+
+::placeholder {
+    color: #e5e5e5;
+    opacity: 1;
+}
+
 .header-bar {
   background-color: #393E42;
   color: #e5e5e5;
@@ -39,6 +48,25 @@ li {
   cursor: pointer;
 }
 
+#super-title:hover {
+  color: #cecece;
+}
+
+#search {
+  width: 500px;
+  background: #565a5c;
+  color: white;
+  font-size: 18px;
+  padding: 4px 10px;
+  border: none;
+  border-radius: 3px;
+}
+
+#search:active, #search:focus {
+  background: #e5e5e5;
+  color: #393e42;
+}
+
 .middle {
   width: 60%;
   margin: auto;
@@ -46,17 +74,29 @@ li {
 
 .page-title {
   font-size: 32px;
-  margin: 5px 0;
+  margin: 8px 0;
 }
 
-.login-button, .myproj-button {
-  color: #e5e5e5;
+.page-subtitle {
+  font-size: 26px;
+  margin: 16px 0 8px;
+}
+
+.l-button {
+  background: #e5e5e5;
+  color: #393e42;
   font-size: 20px;
-  text-decoration: underline;
+  padding: 4px 10px;
+  border-radius: 3px;
 }
 
-.login-button:hover, .myproj-button:hover {
-  color: #b2b2b2;
+.l-button:hover {
+  background: #cecece;
+  color: black;
+}
+
+.l-button:active {
+  transform: translateY(2px);
 }
 
 .login-text {
@@ -67,12 +107,11 @@ li {
   color: #717171;
 }
 
-.home-new {
+#home-new {
   position: fixed;
   bottom: 20px;
   right: 20px;
   border: 1px solid black;
-  padding: 4px;
 }
 
 .proj-card {
