@@ -44,7 +44,41 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 passport.serializeUser((user, done) => {
-  done(null, user);
+  const { _json: {
+      id: userId,
+      displayName: userName,
+      gender,
+      emails: [
+        {
+          value: email
+        }
+      ],
+      image: {
+        url: imageUrl
+      }
+    }
+  } = user;
+
+  utils.paramQuery('SELECT * FROM users WHERE userId = ?', userId)
+  .then((results) => {
+    if (results.length == 0) {
+      const values = { userId, userName, gender, email, imageUrl };
+      utils.paramQuery('INSERT INTO users SET ?', values)
+      .then((results) => {
+        console.log('Added user');
+        done(null, user);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+    } else {
+      console.log('User already exists');
+      done(null, user);
+    }
+  })
+  .catch((err) => {
+    console.log(err);
+  })
 });
 
 passport.deserializeUser((userDataFromCookie, done) => {
@@ -52,12 +86,12 @@ passport.deserializeUser((userDataFromCookie, done) => {
 });
 
 app.get('/auth/google/callback',
-  passport.authenticate('google', { successRedirect : 'back', failureRedirect: 'back', session: true}),
-  function (req, res) {
-    console.log('Here is our user object:', req.user);
-    res.redirect('/');
-  }
-);
+  passport.authenticate('google', { successRedirect : 'back', failureRedirect: 'back', session: true}));
+
+app.get('/logout', function(req, res) {
+  req.logout();
+  res.redirect('/');
+});
 
 app.get('/', function(req, res) {
   utils.noParamQuery('SELECT * FROM projects')
@@ -111,6 +145,21 @@ app.get('/new', function(req, res) {
   res.render('new.html', {loggedIn: req.isAuthenticated()});
 });
 
+app.post('/searchusers', function(req, res) {
+  utils.paramQuery('SELECT * FROM users WHERE userName LIKE ?', `%${req.body.search}%`)
+  .then((results) => {
+    console.log(results);
+    const dataWithSelfRemoved = results.filter((el) => {
+      return el.userName !== req.user.displayName
+    })
+    console.log(dataWithSelfRemoved);
+    res.send(dataWithSelfRemoved);
+  })
+  .catch((err) => {
+    console.log(err);
+  })
+});
+
 app.post('/createproject', function(req, res) {
   const timeStamp = new Date().toString();
   const values = {
@@ -122,8 +171,17 @@ app.post('/createproject', function(req, res) {
   utils.paramQuery('INSERT INTO projects SET ?', values)
   .then((results) => {
     const ownerInfo = [results.insertId, req.user.id, req.user.displayName];
-    utils.paramQuery('INSERT INTO projectsUsers VALUES (?)', [ownerInfo])
-    res.send({ redirect: `/project/${results.insertId}` })
+    utils.paramQuery('INSERT INTO projectsUsers VALUES (?)', [ownerInfo]);
+    const progressRows = req.body.progress.map((el) => {
+      return [
+        results.insertId,
+        req.user.displayName,
+        'Prior',
+        el
+      ]
+    });
+    utils.paramQuery('INSERT INTO updates (fkProjectId, fkUserName, timeStamp, content) VALUES ?', [progressRows]);
+    res.send({ redirect: `/project/${results.insertId}` });
   })
   .catch((err) => {
     console.log(err);
@@ -138,6 +196,7 @@ app.post('/postupdate', function(req, res) {
     timeStamp,
     content: req.body.content,
   }
+  // console.log(values);
   utils.paramQuery('INSERT INTO updates SET ?', values)
   .then((results) => {
     res.send('success');

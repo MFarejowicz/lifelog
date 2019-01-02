@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="description" content="A tool to help you stay accountable.">
     <meta name="author" content="mattf">
-    <title>Stay accountable!</title>
+    <title>LifeLog - Track projects!</title>
 
     <link href="/static/style.css" rel="stylesheet">
     <script src="https://unpkg.com/axios/dist/axios.min.js" defer></script>
@@ -21,7 +21,7 @@
         {% if loggedIn %}
           <div>
             <a id="myproj-button" class="l-button" href="/me">My Projects</a>
-            <a id="logout-button" class="l-button" href="/">Log Out</a>
+            <a id="logout-button" class="l-button" href="/logout">Log Out</a>
           </div>
         {% else %}
           <a id="login-button" class="l-button" href="/auth/google/callback">Log In</a>

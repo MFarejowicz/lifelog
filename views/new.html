@@ -4,36 +4,44 @@
   <div class="middle">
     <h2 class="page-title">Track a New Project</h2>
     {% if loggedIn %}
-      <h4 class="create-prompt">Please enter the following information about the project you'd like to track:</h5>
+      <h4 class="create-prompt">Please enter the following information about the project you'd like to track:</h4>
       <div class="create-input-field">
-        <label>Project name:</label>
+        <label>Project name<sup>*</sup>:</label>
         <input id="proj-name" type="text">
       </div>
       <div class="create-input-field">
-        <label>Project description:</label>
+        <label>Description:</label>
         <textarea id="proj-desc" rows="1"></textarea>
       </div>
       <div class="create-input-field">
-        <label>Projected Deadline (optional):</label>
+        <label>Deadline:</label>
         <input id="proj-deadline" type="date">
       </div>
       <div class="create-input-field">
-        <label>Current progress (optional):</label>
-        <input id="proj-prog" type="text" disabled>
+        <label>Prior progress (oldest first) :</label>
+        <input id="proj-prog" type="text">
+        <div><button onclick="addProgress()" id="add-proj-prog">Add</button></div>
+      </div>
+      <div>
+        <ul id="prog-list"></ul>
       </div>
       <div class="create-input-field">
-        <label>Picture (optional):</label>
-        <input id="proj-pic" type="image" disabled>
+        <label>Collaborators:</label>
+        <div>
+          <input oninput="updateData()" id="proj-collab-input">
+          <div id="collab-dropdown"></div>
+        </div>
+        <div><button onclick="addCollab()" id="add-collab">Add</button></div>
       </div>
-      <div class="create-input-field">
-        <label>Collaborators (optional):</label>
-        <input id="proj-collab" type="text" disabled>
+      <div>
+        <ul id="collab-list"></ul>
       </div>
-      <div class="create-input-field">
-        <label>Tags (optional):</label>
-        <input id="proj-tags" type="text" disabled>
-      </div class="create-input-field">
-      <button onclick="createProject()" id="create">Create project page</button>
+      <div>
+        <button onclick="createProject()" id="create">Create project page</button>
+      </div>
+      <!-- <div>
+        <p>Current progress can be added once the project page is created</p>
+      </div> -->
     {% else %}
       <p>You must be <a class="login-text" href="/auth/google/callback">logged in</a> to create a project page.</p>
     {% endif %}

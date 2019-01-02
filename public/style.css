@@ -143,6 +143,35 @@ input:focus {
   margin-right: 4px;
 }
 
+#prog-list, #collab-list {
+  width: 50%;
+}
+
+.prog-list-el-div, .collab-list-el-div {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.remove-prog:hover, .remove-collab:hover {
+  color: red;
+  cursor: pointer;
+}
+
+#collab-dropdown {
+  position: absolute;
+}
+
+.collab-dropdown-item, .collab-dropdown-empty {
+  background-color: white;
+  padding: 5px;
+}
+
+.collab-dropdown-item:hover {
+  cursor: pointer;
+  background-color: gray;
+}
+
 #create {
   margin: 4px 10px;
   font-size: 20px;
