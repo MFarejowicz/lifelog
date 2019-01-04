@@ -16,7 +16,8 @@
       <div class="header">
         <h1 id="super-title">LifeLog!</h1>
         <div id="search-bar">
-          <input id="search" type="text" placeholder="Search for a project...">
+          <input oninput="search()" id="search" type="text" placeholder="Search for a project or user...">
+          <div id="search-dropdown"></div>
         </div>
         {% if loggedIn %}
           <div>

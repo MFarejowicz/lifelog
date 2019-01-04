@@ -136,18 +136,32 @@ function parseDate(s) {
 function createProject() {
   const nameInput = document.getElementById('proj-name');
   const name = nameInput.value;
+
   const descInput = document.getElementById('proj-desc');
   const desc = descInput.value;
+
   const deadlineInput = document.getElementById('proj-deadline');
   const deadline = deadlineInput.value ? parseDate(deadlineInput.value) : '';
+
   const progList = document.getElementById('prog-list').getElementsByTagName("li");
   const progress = [];
   for (const li of progList) {
     progress.push(li.firstChild.firstChild.innerText);
   }
   progress.reverse();
+
+  const collabList = document.getElementById('collab-list').getElementsByTagName("li");
+  const collab = [];
+  for (const li of collabList) {
+    const person = {};
+    person.name = li.firstChild.firstChild.innerText;
+    person.id = li.firstChild.firstChild.getAttribute('data-id');
+    collab.push(person);
+  }
+  collab.reverse();
+  
   if (name) {
-    axios.post('/createproject', { name, desc, deadline, progress })
+    axios.post('/createproject', { name, desc, deadline, progress, collab })
     .then((res) => {
       if (res.data.redirect) {
         document.location.href = res.data.redirect;

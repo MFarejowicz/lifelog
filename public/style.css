@@ -158,11 +158,15 @@ input:focus {
   cursor: pointer;
 }
 
+#search-dropdown {
+  position: absolute;
+}
+
 #collab-dropdown {
   position: absolute;
 }
 
-.collab-dropdown-item, .collab-dropdown-empty {
+.search-dropdown-empty, .collab-dropdown-item, .collab-dropdown-empty {
   background-color: white;
   padding: 5px;
 }

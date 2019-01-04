@@ -145,14 +145,34 @@ app.get('/new', function(req, res) {
   res.render('new.html', {loggedIn: req.isAuthenticated()});
 });
 
+app.post('/search', function(req, res) {
+  Promise.all([
+    utils.paramQuery('SELECT * FROM projects WHERE name LIKE ?', `%${req.body.search}%`),
+    utils.paramQuery('SELECT * FROM users WHERE userName LIKE ?', `%${req.body.search}%`)
+  ])
+  .then((results) => {
+    const output = [];
+    const projects = results[0];
+    projects.forEach((el) => {
+      output.push({ type: 'project', data: el});
+    });
+    const users = results[1];
+    users.forEach((el) => {
+      output.push({ type: 'user', data: el});
+    });
+    res.send(output);
+  })
+  .catch((err) => {
+    console.log(err);
+  });
+});
+
 app.post('/searchusers', function(req, res) {
   utils.paramQuery('SELECT * FROM users WHERE userName LIKE ?', `%${req.body.search}%`)
   .then((results) => {
-    console.log(results);
     const dataWithSelfRemoved = results.filter((el) => {
       return el.userName !== req.user.displayName
     })
-    console.log(dataWithSelfRemoved);
     res.send(dataWithSelfRemoved);
   })
   .catch((err) => {
@@ -170,8 +190,18 @@ app.post('/createproject', function(req, res) {
   };
   utils.paramQuery('INSERT INTO projects SET ?', values)
   .then((results) => {
-    const ownerInfo = [results.insertId, req.user.id, req.user.displayName];
-    utils.paramQuery('INSERT INTO projectsUsers VALUES (?)', [ownerInfo]);
+    const owners = [];
+    owners.push([results.insertId, req.user.id, req.user.displayName]);
+    const collabRows = req.body.collab.map((el) => {
+      return [
+        results.insertId,
+        el.id,
+        el.name
+      ]
+    });
+    owners.push(...collabRows)
+    utils.paramQuery('INSERT INTO projectsUsers VALUES ?', [owners]);
+
     const progressRows = req.body.progress.map((el) => {
       return [
         results.insertId,
@@ -181,6 +211,7 @@ app.post('/createproject', function(req, res) {
       ]
     });
     utils.paramQuery('INSERT INTO updates (fkProjectId, fkUserName, timeStamp, content) VALUES ?', [progressRows]);
+
     res.send({ redirect: `/project/${results.insertId}` });
   })
   .catch((err) => {
@@ -196,7 +227,6 @@ app.post('/postupdate', function(req, res) {
     timeStamp,
     content: req.body.content,
   }
-  // console.log(values);
   utils.paramQuery('INSERT INTO updates SET ?', values)
   .then((results) => {
     res.send('success');
