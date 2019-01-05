@@ -21,7 +21,7 @@ function createProgListEl(prog) {
   removeProg.appendChild(document.createTextNode('X'));
   progListElDiv.appendChild(removeProg);
 
-  progList.insertBefore(progListEl, progList.firstChild);
+  progList.appendChild(progListEl);
 }
 
 function createCollabListEl(collab, id) {
@@ -50,7 +50,7 @@ function createCollabListEl(collab, id) {
   removeCollab.appendChild(document.createTextNode('X'));
   collabListElDiv.appendChild(removeCollab);
 
-  collabList.insertBefore(collabListEl, collabList.firstChild);
+  collabList.appendChild(collabListEl);
   document.getElementById('proj-collab-input').value = "";
   clearDropdown();
 }
@@ -159,7 +159,7 @@ function createProject() {
     collab.push(person);
   }
   collab.reverse();
-  
+
   if (name) {
     axios.post('/createproject', { name, desc, deadline, progress, collab })
     .then((res) => {

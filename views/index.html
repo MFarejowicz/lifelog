@@ -7,11 +7,11 @@
     {% for project in projects | reverse() %}
       {% if looping %}
         <div class="proj-card">
-          <a href={{"/project/" + project.projectId}}>
-            <p class="proj-card-name">{{ project.name }}</p>
-            {% if project.description %}
-            <p class="proj-card-description">{{ project.description }}</p>
-            {% endif %}
+          <a class="proj-card-info" href={{"/project/" + project.projectId}}>
+            <div>
+              <p class="proj-card-name">{{ project.name }}</p>
+              <p class="proj-card-description">{{ project.description }}</p>
+            </div>
           </a>
         </div>
         {% if loop.index == 6 %}

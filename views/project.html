@@ -3,40 +3,75 @@
 {% block content %}
   <div class="middle">
     {% if project %}
-      <h2 class="page-title">{{ project.name }}</h2>
+      <div style="display: flex; align-items: center">
+        <h2 class="page-title">{{ project.name }}</h2>
+        {% if isOwner %}
+        <div>
+          <img class="edit" src="/static/img/edit.png"></img>
+        </div>
+        {% endif %}
+      </div>
+      <div id="modal">
+        <div class="modal-content">
+          <div class="modal-top">
+            <p id="close-modal">X</p>
+          </div>
+          <div class="modal-mid">
+            <span id="modal-text">Are you sure?</span>
+            <button id="delete-yes">Yes</button>
+            <button id="delete-no">No</button>
+          </div>
+        </div>
+      </div>
       <div class="proj-container">
         <div class="proj-left">
-          <div style="margin-bottom: 4px">
-            <span style="font-weight: bold">Owner(s): </span>
+          <div style="margin: 5px 0">
+            {% if isOwner %}
+            <img class="edit" src="/static/img/edit.png"></img>
+            {% endif %}
+            <span style="font-weight: bold">Owner(s): </span><br/>
             <span>{{ ownerNames }}</span>
-            <span style="font-weight: bold">Created: </span>
+          </div>
+          <div style="margin: 5px 0">
+            <span style="font-weight: bold">Created: </span><br/>
             <span>{{ project.createTime }}</span>
           </div>
           {% if project.description %}
-          <div style="margin-bottom: 4px">
-            <span style="font-weight: bold">Description: </span>
+          <div style="margin: 5px 0">
+            {% if isOwner %}
+            <img class="edit" src="/static/img/edit.png"></img>
+            {% endif %}
+            <span style="font-weight: bold">Description: </span><br/>
             <span>{{ project.description }}</span>
           </div>
           {% endif %}
           {% if project.deadline %}
-          <div style="margin-bottom: 4px">
-            <span style="font-weight: bold">Projected Deadline: </span>
+          <div style="margin: 5px 0">
+            {% if isOwner %}
+            <img class="edit" src="/static/img/edit.png"></img>
+            {% endif %}
+            <span style="font-weight: bold">Projected Deadline: </span><br/>
             <span>{{ project.deadline }}</span>
           </div>
           {% endif %}
         </div>
         <div class="proj-right">
         <h4>Project Progress:</h4>
-        {% for update in updates | reverse() %}
+        {% for update in updates %}
           <div class="update-card">
-            <li>
+            <div>
               <span class="update-card-time">{{ update.timeStamp }} - </span>
               <span class="update-card-poster">{{ update.fkUserName }}: </span>
               <span class="update-card-content">{{ update.content }}</span>
-            </li>
+            </div>
+            {% if isOwner %}
+            <div class="update-card-delete" data-id={{update.updateId}}>
+              <span class="update-card-x">X</span>
+            </div>
+            {% endif %}
           </div>
           {% else %}
-          <li>No current updates</li>
+          <div class="update-card">No current updates</div>
         {% endfor %}
         {% if isOwner %}
           <div style="display: flex; align-items: center; margin-top: 6px">
@@ -51,14 +86,14 @@
       <div style="margin-bottom: 6px">
       {% for comment in projectComments %}
         <div class="p-comments-card">
-          <li>
+          <div>
             <span class="p-comments-card-time">{{ comment.timeStamp }} - </span>
             <span class="p-comments-card-poster">{{ comment.fkUserName }}: </span>
             <span class="p-comments-card-content">{{ comment.comment }}</span>
-          </li>
+          </div>
         </div>
       {% else %}
-      <li>No current comments</li>
+      <div class="p-comments-card">No current comments</div>
       {% endfor %}
       </div>
       {% if loggedIn %}

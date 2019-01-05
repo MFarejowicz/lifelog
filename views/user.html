@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="middle">
+  {% if validUser %}
+    <h2 class="page-title">{{ userInfo.userName }}'s Projects</h2>
+      {% for project in userProjects %}
+        <div class="proj-card">
+          <a class="proj-card-info" href={{"/project/" + project.projectId}}>
+            <div>
+              <p class="proj-card-name">{{ project.name }}</p>
+              <p class="proj-card-description">{{ project.description }}</p>
+            </div>
+          </a>
+        </div>
+        {% else %}
+        <li>No current projects</li>
+      {% endfor %}
+  {% else %}
+    <h2 class="page-title">This user does not exist.</h2>
+  {% endif %}
+</div>
+<script type="text/javascript" src="/static/user.js" defer></script>
+{% endblock %}

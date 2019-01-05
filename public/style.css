@@ -72,6 +72,64 @@ input:focus {
   margin: auto;
 }
 
+#modal {
+    display: none; /* Hidden by default */
+    position: fixed; /* Stay in place */
+    z-index: 1; /* Sit on top */
+    left: 0;
+    top: 0;
+    width: 100%; /* Full width */
+    height: 100%; /* Full height */
+    overflow: auto; /* Enable scroll if needed */
+    background-color: rgb(0,0,0); /* Fallback color */
+    background-color: rgba(0,0,0,0.75); /* Black w/ opacity */
+}
+
+.modal-content {
+  position: relative;
+  top: 200px;
+  background-color: #fefefe;
+  margin: auto;
+  padding: 0;
+  width: 40%;
+  border: 1px solid #888;
+  border-radius: 8px;
+  box-shadow: 0 0 20px #000;
+  -webkit-animation-name: slideIn;
+  -webkit-animation-duration: 0.4s;
+  animation-name: slideIn;
+  animation-duration: 0.4s
+}
+
+.modal-top {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.modal-mid {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  font-size: 30px;
+  margin-bottom: 30px;
+}
+
+#close-modal {
+  font-size: 25px;
+  font-weight: bold;
+  margin-right: 10px;
+}
+
+#close-modal:hover {
+  color: red;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+#close-modal:focus {
+  outline: 0;
+}
+
 .page-title {
   font-size: 32px;
   margin: 8px 0;
@@ -115,18 +173,38 @@ input:focus {
 }
 
 .proj-card {
+  display: flex;
+  align-items: center;
   border: 2px solid black;
   margin: 10px;
-  padding: 10px;
 }
 
 .proj-card:hover {
   transform: scale(1.02, 1.02);
 }
 
+.proj-card-info {
+  flex: 1;
+  padding: 10px;
+}
+
 .proj-card-name {
   font-size: 26px;
   font-weight: bold;
+}
+
+.proj-card-delete {
+  padding: 10px;
+  cursor: pointer;
+}
+
+.proj-card-x {
+  font-size: 26px;
+  font-weight: bold;
+}
+
+.proj-card-delete:hover {
+  color: red;
 }
 
 .create-prompt {
@@ -181,6 +259,10 @@ input:focus {
   font-size: 20px;
 }
 
+.edit {
+  cursor: pointer;
+}
+
 .proj-container {
   display: flex;
   margin-bottom: 50px;
@@ -188,6 +270,7 @@ input:focus {
 
 .proj-left {
   flex: 1;
+  padding-right: 4px;
   border-right: 1px solid black;
 }
 
@@ -198,4 +281,27 @@ input:focus {
 
 #proj-update, #proj-comment {
   margin: 0 2px;
+}
+
+.update-card {
+  margin: 4px;
+  padding: 4px;
+  border: 1px solid black;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.update-card-delete {
+  cursor: pointer;
+}
+
+.update-card-delete:hover {
+  color: red;
+}
+
+.p-comments-card {
+  margin: 4px;
+  padding: 4px;
+  border: 1px solid black;
 }

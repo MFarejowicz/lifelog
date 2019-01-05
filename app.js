@@ -10,20 +10,20 @@ const utils = require('./utils');
 
 const app = express();
 
-// Configure app to use bodyParser()
-// This will let us get the data from a POST
+// SETUP bodyParser to let us get data from a POST
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
-// Make resources available
+// SETUP resources like style sheets and scripts
 app.use('/static', express.static(path.join(__dirname, '/public')));
 
+// SETUP nunjucks to be used for rendering
 nunjucks.configure('views', {
     autoescape: true,
     express: app
 });
 
-// Set up passport strategy
+// SETUP Google Auth for login and logout
 passport.use(new GoogleStrategy({
     clientID: googleCredentials.clientId,
     clientSecret: googleCredentials.clientSecret,
@@ -93,6 +93,8 @@ app.get('/logout', function(req, res) {
   res.redirect('/');
 });
 
+// SETUP all GET routes for viewing pages
+// Landing page
 app.get('/', function(req, res) {
   utils.noParamQuery('SELECT * FROM projects')
   .then((results) => {
@@ -103,6 +105,7 @@ app.get('/', function(req, res) {
   });
 });
 
+// Project page
 app.get('/project/:project', function(req, res) {
   Promise.all([
     utils.paramQuery('SELECT * FROM projects WHERE projectId = ?', req.params.project),
@@ -113,7 +116,7 @@ app.get('/project/:project', function(req, res) {
   .then((results) => {
     const dbHit = results[0][0];
     const ownerList = results[1];
-    const ownerNames = ownerList.map(el => el.fkUserName)
+    const ownerNames = ownerList.map(el => el.fkUserName).join(', ');
     let isOwner = false;
     if (req.user) {
       isOwner = ownerList.some(el => el.fkUserId === req.user.id);
@@ -127,6 +130,28 @@ app.get('/project/:project', function(req, res) {
   });
 });
 
+// Other user's projects page
+app.get('/user/:user', function(req, res) {
+  Promise.all([
+    utils.paramQuery('SELECT * FROM users WHERE userId = ?', req.params.user),
+    utils.paramQuery('SELECT projects.* FROM projectsUsers JOIN projects ON fkProjectId=projectId WHERE fkUserId = ?', req.params.user)
+  ])
+  .then((results) => {
+    const userHits = results[0];
+    if (userHits.length > 0) {
+      const userInfo = userHits[0];
+      const userProjects = results[1];
+      res.render('user.html', { validUser: true, userInfo, userProjects, loggedIn: req.isAuthenticated() });
+    } else {
+      res.render('user.html', { validUser: false, loggedIn: req.isAuthenticated() });
+    }
+  })
+  .catch((error) => {
+    console.log(error);
+  })
+})
+
+// My projects page
 app.get('/me', function(req, res) {
   if (req.isAuthenticated()) {
     utils.paramQuery('SELECT projects.* FROM projectsUsers JOIN projects ON fkProjectId=projectId WHERE fkUserId = ?', req.user.id)
@@ -141,10 +166,13 @@ app.get('/me', function(req, res) {
   }
 });
 
+// New project page
 app.get('/new', function(req, res) {
   res.render('new.html', {loggedIn: req.isAuthenticated()});
 });
 
+// SETUP all POST routes for performing actions
+// Website search
 app.post('/search', function(req, res) {
   Promise.all([
     utils.paramQuery('SELECT * FROM projects WHERE name LIKE ?', `%${req.body.search}%`),
@@ -167,6 +195,7 @@ app.post('/search', function(req, res) {
   });
 });
 
+// Collaborator search
 app.post('/searchusers', function(req, res) {
   utils.paramQuery('SELECT * FROM users WHERE userName LIKE ?', `%${req.body.search}%`)
   .then((results) => {
@@ -180,6 +209,7 @@ app.post('/searchusers', function(req, res) {
   })
 });
 
+// Project creation
 app.post('/createproject', function(req, res) {
   const timeStamp = new Date().toString();
   const values = {
@@ -219,6 +249,37 @@ app.post('/createproject', function(req, res) {
   });
 });
 
+// Project deletion
+app.post('/deleteproject', function(req, res) {
+  Promise.all([
+    utils.paramQuery('DELETE FROM projects WHERE projectId = ?', req.body.projectId),
+    utils.paramQuery('DELETE FROM updates WHERE fkProjectId = ?', req.body.projectId),
+    utils.paramQuery('DELETE FROM projectComments WHERE fkProjectId = ?', req.body.projectId),
+    utils.paramQuery('DELETE FROM projectsUsers WHERE fkProjectId = ?', req.body.projectId),
+  ])
+  .then((results) => {
+    console.log('Successful project deletion');
+    res.send('success');
+  })
+  .catch((err) => {
+    console.log(err);
+    res.send('error');
+  })
+});
+
+app.post('/deleteupdate', function(req, res) {
+  utils.paramQuery('DELETE FROM updates WHERE updateId = ?', req.body.updateId)
+  .then((results) => {
+    console.log('Successful update deletion');
+    res.send('success');
+  })
+  .catch((err) => {
+    console.log(err);
+    res.send('error');
+  })
+})
+
+// Project update posting
 app.post('/postupdate', function(req, res) {
   const timeStamp = new Date().toLocaleString('en-US');
   const values = {
@@ -236,12 +297,15 @@ app.post('/postupdate', function(req, res) {
   });
 });
 
+
+// Project comment posting
 app.post('/postprojectcomment', function(req, res) {
   // const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
   const timeStamp = new Date().toLocaleString('en-US');
   const values = {
     fkProjectId: req.body.projectId,
     fkUserName: req.user.displayName,
+    fkUserId: req.user.id,
     timeStamp,
     comment: req.body.projectComment,
   }

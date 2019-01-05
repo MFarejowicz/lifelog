@@ -3,19 +3,36 @@
 {% block content %}
 <div class="middle">
   <h2 class="page-title">My Projects</h2>
+  <div id="modal">
+    <div class="modal-content">
+      <div class="modal-top">
+        <p id="close-modal">X</p>
+      </div>
+      <div class="modal-mid">
+        <span id="modal-text">Are you sure?</span>
+        <button id="delete-yes">Yes</button>
+        <button id="delete-no">No</button>
+      </div>
+    </div>
+  </div>
   {% if loggedIn %}
     {% for project in projects %}
       <div class="proj-card">
-        <a href={{"/project/" + project.projectId}}>
-          <p class="proj-card-name">{{ project.name }}</p>
-          <p class="proj-card-description">{{ project.description }}</p>
+        <a class="proj-card-info" href={{"/project/" + project.projectId}}>
+          <div>
+            <p class="proj-card-name">{{ project.name }}</p>
+            <p class="proj-card-description">{{ project.description }}</p>
+          </div>
         </a>
+        <div class="proj-card-delete" data-id={{project.projectId}}>
+          <span class="proj-card-x">X</span>
+        </div>
       </div>
       {% else %}
       <li>No current projects</li>
     {% endfor %}
     <div class="proj-card">
-      <a href="/new"><p>+ Track a new project</p></a>
+      <a style="padding: 10px; flex: 1" href="/new"><p>+ Track a new project</p></a>
     </div>
   {% else %}
     <p><a class="login-text" href="/auth/google/callback">Log in</a> to view your projects.</p>
