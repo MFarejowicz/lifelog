@@ -259,6 +259,23 @@ input:focus {
   font-size: 20px;
 }
 
+#project-title {
+  font-size: 32px;
+  margin: 8px 0;
+}
+
+#name-input, #name-save, #name-cancel {
+  display: none;
+}
+
+#desc-input, #desc-save, #desc-cancel {
+  display: none;
+}
+
+#deadline-input, #deadline-save, #deadline-cancel {
+  display: none;
+}
+
 .edit {
   cursor: pointer;
 }

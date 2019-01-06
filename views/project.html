@@ -4,10 +4,13 @@
   <div class="middle">
     {% if project %}
       <div style="display: flex; align-items: center">
-        <h2 class="page-title">{{ project.name }}</h2>
+        <h2 id="project-title">{{ project.name }}</h2>
         {% if isOwner %}
+        <input id="name-input" type="text" value="{{project.name}}" data-id={{project.projectId}}>
+        <button id="name-save">Save</button>
+        <button id="name-cancel">Cancel</button>
         <div>
-          <img class="edit" src="/static/img/edit.png"></img>
+          <img id="name-edit" class="edit" src="/static/img/edit.png"></img>
         </div>
         {% endif %}
       </div>
@@ -39,19 +42,29 @@
           {% if project.description %}
           <div style="margin: 5px 0">
             {% if isOwner %}
-            <img class="edit" src="/static/img/edit.png"></img>
+            <img id="desc-edit" class="edit" src="/static/img/edit.png"></img>
             {% endif %}
             <span style="font-weight: bold">Description: </span><br/>
-            <span>{{ project.description }}</span>
+            <span id="desc-span">{{ project.description }}</span>
+            {% if isOwner %}
+            <input id="desc-input" type="text" value="{{project.description}}" data-id={{project.projectId}}>
+            <button id="desc-save">Save</button>
+            <button id="desc-cancel">Cancel</button>
+            {% endif %}
           </div>
           {% endif %}
           {% if project.deadline %}
           <div style="margin: 5px 0">
             {% if isOwner %}
-            <img class="edit" src="/static/img/edit.png"></img>
+            <img id="deadline-edit" class="edit" src="/static/img/edit.png"></img>
             {% endif %}
             <span style="font-weight: bold">Projected Deadline: </span><br/>
-            <span>{{ project.deadline }}</span>
+            <span id="deadline-span">{{ project.deadline }}</span>
+            {% if isOwner %}
+            <input id="deadline-input" type="date" data-id={{project.projectId}}>
+            <button id="deadline-save">Save</button>
+            <button id="deadline-cancel">Cancel</button>
+            {% endif %}
           </div>
           {% endif %}
         </div>

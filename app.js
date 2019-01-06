@@ -267,6 +267,7 @@ app.post('/deleteproject', function(req, res) {
   })
 });
 
+// Update deletion
 app.post('/deleteupdate', function(req, res) {
   utils.paramQuery('DELETE FROM updates WHERE updateId = ?', req.body.updateId)
   .then((results) => {
@@ -277,7 +278,46 @@ app.post('/deleteupdate', function(req, res) {
     console.log(err);
     res.send('error');
   })
-})
+});
+
+// Project name change
+app.post('/changename', function(req, res) {
+  utils.paramQuery('UPDATE projects SET name = ? WHERE projectId = ?', [req.body.newName, req.body.projectId])
+  .then((results) => {
+    console.log('Successful name change');
+    res.send('success');
+  })
+  .catch((err) => {
+    console.log(err);
+    res.send('error');
+  })
+});
+
+// Project description change
+app.post('/changedesc', function(req, res) {
+  utils.paramQuery('UPDATE projects SET description = ? WHERE projectId = ?', [req.body.newDesc, req.body.projectId])
+  .then((results) => {
+    console.log('Successful deadline change');
+    res.send('success');
+  })
+  .catch((err) => {
+    console.log(err);
+    res.send('error');
+  })
+});
+
+// Project deadline change
+app.post('/changedeadline', function(req, res) {
+  utils.paramQuery('UPDATE projects SET deadline = ? WHERE projectId = ?', [req.body.newDeadline, req.body.projectId])
+  .then((results) => {
+    console.log('Successful description change');
+    res.send('success');
+  })
+  .catch((err) => {
+    console.log(err);
+    res.send('error');
+  })
+});
 
 // Project update posting
 app.post('/postupdate', function(req, res) {
