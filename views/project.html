@@ -30,10 +30,22 @@
         <div class="proj-left">
           <div style="margin: 5px 0">
             {% if isOwner %}
-            <img class="edit" src="/static/img/edit.png"></img>
+            <img id="owner-edit" class="edit" src="/static/img/edit.png"></img>
             {% endif %}
             <span style="font-weight: bold">Owner(s): </span><br/>
-            <span>{{ ownerNames }}</span>
+            <span id="owner-span">{{ ownerNames }}</span>
+            {% if isOwner %}
+            <div>
+              <input oninput="updateData()" id="owner-input" type="text" data-id={{project.projectId}}>
+              <div id="owner-dropdown"></div>
+            </div>
+            <button onclick="addCollab()" id="owner-add">Add</button>
+            <div>
+              <ul id="owner-list" data-id={{project.projectId}}></ul>
+            </div>
+            <button id="owner-save">Save</button>
+            <button id="owner-cancel">Cancel</button>
+            {% endif %}
           </div>
           <div style="margin: 5px 0">
             <span style="font-weight: bold">Created: </span><br/>

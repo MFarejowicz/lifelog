@@ -130,6 +130,20 @@ app.get('/project/:project', function(req, res) {
   });
 });
 
+// Project owners
+app.get('/owners/:project', function(req, res) {
+  utils.paramQuery('SELECT fkUserId, fkUserName FROM projectsUsers WHERE fkProjectId = ?', req.params.project)
+  .then((results) => {
+    const dataWithSelfRemoved = results.filter((el) => {
+      return el.fkUserId !== req.user.id;
+    });
+    res.send(dataWithSelfRemoved);
+  })
+  .catch((err) => {
+    console.log(err);
+  })
+})
+
 // Other user's projects page
 app.get('/user/:user', function(req, res) {
   Promise.all([
@@ -201,7 +215,7 @@ app.post('/searchusers', function(req, res) {
   .then((results) => {
     const dataWithSelfRemoved = results.filter((el) => {
       return el.userName !== req.user.displayName
-    })
+    });
     res.send(dataWithSelfRemoved);
   })
   .catch((err) => {
@@ -291,6 +305,35 @@ app.post('/changename', function(req, res) {
     console.log(err);
     res.send('error');
   })
+});
+
+// Project name change
+app.post('/changeowner', function(req, res) {
+  utils.paramQuery('DELETE FROM projectsUsers WHERE fkProjectId = ?', req.body.projectId)
+  .then((temp) => {
+    const owners = [];
+    owners.push([req.body.projectId, req.user.id, req.user.displayName]);
+    const collabRows = req.body.collab.map((el) => {
+      return [
+        req.body.projectId,
+        el.id,
+        el.name
+      ]
+    });
+    owners.push(...collabRows);
+    utils.paramQuery('INSERT INTO projectsUsers (fkProjectId, fkUserId, fkUserName) VALUES ?', [owners])
+    .then((results) => {
+      console.log('Successful owner change');
+      res.send('success');
+    })
+    .catch((err) => {
+      console.log(err);
+      res.send('error');
+    })
+  })
+  .catch((err) => {
+    console.log(err);
+  });
 });
 
 // Project description change

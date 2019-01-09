@@ -276,6 +276,10 @@ input:focus {
   display: none;
 }
 
+#owner-input, #owner-save, #owner-cancel, #owner-add, #owner-list {
+  display: none;
+}
+
 .edit {
   cursor: pointer;
 }
