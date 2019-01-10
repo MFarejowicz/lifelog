@@ -326,3 +326,7 @@ input:focus {
   padding: 4px;
   border: 1px solid black;
 }
+
+.p-sub-comments-card {
+  margin-left: 20px;
+}

@@ -14,11 +14,11 @@ function postUpdate(projectId) {
   }
 };
 
-function postProjectComment(projectId) {
+function postComment(projectId) {
   const projectCommentInput = document.getElementById('proj-comment');
-  const projectComment = projectCommentInput.value;
-  if (projectComment) {
-    axios.post('/postprojectcomment', { projectId, projectComment })
+  const comment = projectCommentInput.value;
+  if (comment) {
+    axios.post('/postcomment', { projectId, comment })
     .then((res) => {
       location.reload();
     })
@@ -27,6 +27,20 @@ function postProjectComment(projectId) {
     });
   }
 };
+
+function postCommentReply(projectId, commentId) {
+  const replyInput = document.getElementById(commentId + '-reply');
+  const comment = replyInput.value;
+  if (comment) {
+    axios.post('/postcomment', { projectId, comment, commentId })
+    .then((res) => {
+      location.reload();
+    })
+    .catch((error) => {
+      console.log(error);
+    });
+  }
+}
 
 function parseDate(s) {
   const b = s.split(/\D/);

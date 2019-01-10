@@ -109,7 +109,7 @@
       </div>
       <h4>Project Comments:</h4>
       <div style="margin-bottom: 6px">
-      {% for comment in projectComments %}
+      {% for comment in comments %}
         <div class="p-comments-card">
           <div>
             <span class="p-comments-card-time">{{ comment.timeStamp }} - </span>
@@ -117,6 +117,21 @@
             <span class="p-comments-card-content">{{ comment.comment }}</span>
           </div>
         </div>
+        {% for childComment in comment.children %}
+          <div class="p-sub-comments-card">
+            <div>
+              <span class="p-comments-card-time">{{ childComment.timeStamp }} - </span>
+              <span class="p-comments-card-poster">{{ childComment.fkUserName }}: </span>
+              <span class="p-comments-card-content">{{ childComment.comment }}</span>
+            </div>
+          </div>
+        {% endfor %}
+        {% if loggedIn %}
+        <div>
+          <input id={{comment.commentId + "-reply"}}>
+          <button onclick={{"postCommentReply(" + project.projectId + "," + comment.commentId + ")"}}>Reply</button>
+        </div>
+        {% endif %}
       {% else %}
       <div class="p-comments-card">No current comments</div>
       {% endfor %}
@@ -125,7 +140,7 @@
         <div style="display: flex; align-items: center">
           <label>Comment on the project:</label>
           <textarea id="proj-comment" rows="1" cols="70"></textarea>
-          <button onclick={{"postProjectComment(" + project.projectId + ")"}} id="post-proj-comment">Comment!</button>
+          <button onclick={{"postComment(" + project.projectId + ")"}} id="post-proj-comment">Comment!</button>
         </div>
       {% else %}
         <p>Log in to comment on the project</p>

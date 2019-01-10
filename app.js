@@ -4,8 +4,8 @@ const bodyParser = require('body-parser');
 const nunjucks = require('nunjucks');
 const passport = require('passport');
 const GoogleStrategy = require('passport-google-oauth20').Strategy;
-const { googleCredentials } = require('./credentials');
 const session = require('express-session');
+const { googleCredentials } = require('./credentials');
 const utils = require('./utils');
 
 const app = express();
@@ -44,7 +44,8 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 passport.serializeUser((user, done) => {
-  const { _json: {
+  const {
+    _json: {
       id: userId,
       displayName: userName,
       gender,
@@ -65,20 +66,20 @@ passport.serializeUser((user, done) => {
       const values = { userId, userName, gender, email, imageUrl };
       utils.paramQuery('INSERT INTO users SET ?', values)
       .then((results) => {
-        console.log('Added user');
+        console.log(`Created a new user: ${userName}`);
         done(null, user);
       })
       .catch((err) => {
         console.log(err);
       });
     } else {
-      console.log('User already exists');
+      console.log(`User ${userName} logged in`);
       done(null, user);
     }
   })
   .catch((err) => {
     console.log(err);
-  })
+  });
 });
 
 passport.deserializeUser((userDataFromCookie, done) => {
@@ -86,7 +87,8 @@ passport.deserializeUser((userDataFromCookie, done) => {
 });
 
 app.get('/auth/google/callback',
-  passport.authenticate('google', { successRedirect : 'back', failureRedirect: 'back', session: true}));
+  passport.authenticate('google', { successRedirect : 'back', failureRedirect: 'back', session: true})
+);
 
 app.get('/logout', function(req, res) {
   req.logout();
@@ -105,25 +107,40 @@ app.get('/', function(req, res) {
   });
 });
 
+// Helper function to sort parent and children comments
+function sortComments(comments) {
+  const commentMap = {};
+  for (let comment of comments) {
+    if (comment.parent) {
+      let element = commentMap[comment.parent];
+      element.children.push(comment);
+    } else {
+      comment.children = [];
+      commentMap[comment.commentId] = comment;
+    }
+  }
+  return Object.values(commentMap);
+}
+
 // Project page
 app.get('/project/:project', function(req, res) {
   Promise.all([
     utils.paramQuery('SELECT * FROM projects WHERE projectId = ?', req.params.project),
     utils.paramQuery('SELECT fkUserId, fkUserName FROM projectsUsers WHERE fkProjectId = ?', req.params.project),
     utils.paramQuery('SELECT * FROM updates WHERE fkProjectId=?', req.params.project),
-    utils.paramQuery('SELECT * FROM projectComments WHERE fkProjectId=?', req.params.project),
+    utils.paramQuery('SELECT * FROM comments WHERE fkProjectId=?', req.params.project),
   ])
   .then((results) => {
     const dbHit = results[0][0];
     const ownerList = results[1];
-    const ownerNames = ownerList.map(el => el.fkUserName).join(', ');
+    const ownerNames = ownerList.map(el => el.fkUserName);
     let isOwner = false;
     if (req.user) {
       isOwner = ownerList.some(el => el.fkUserId === req.user.id);
     }
     const updates = results[2];
-    const projectComments = results[3];
-    res.render('project.html', {project: dbHit, updates, ownerNames, isOwner, projectComments, loggedIn: req.isAuthenticated()});
+    const comments = sortComments(results[3]);
+    res.render('project.html', {project: dbHit, updates, ownerNames, isOwner, comments, loggedIn: req.isAuthenticated()});
   })
   .catch((err) => {
     console.log(err);
@@ -148,7 +165,7 @@ app.get('/owners/:project', function(req, res) {
 app.get('/user/:user', function(req, res) {
   Promise.all([
     utils.paramQuery('SELECT * FROM users WHERE userId = ?', req.params.user),
-    utils.paramQuery('SELECT projects.* FROM projectsUsers JOIN projects ON fkProjectId=projectId WHERE fkUserId = ?', req.params.user)
+    utils.paramQuery('SELECT projects.* FROM projectsUsers JOIN projects ON fkProjectId=projectId WHERE fkUserId = ?', req.params.user),
   ])
   .then((results) => {
     const userHits = results[0];
@@ -162,7 +179,7 @@ app.get('/user/:user', function(req, res) {
   })
   .catch((error) => {
     console.log(error);
-  })
+  });
 })
 
 // My projects page
@@ -194,14 +211,17 @@ app.post('/search', function(req, res) {
   ])
   .then((results) => {
     const output = [];
+
     const projects = results[0];
     projects.forEach((el) => {
       output.push({ type: 'project', data: el});
     });
+
     const users = results[1];
     users.forEach((el) => {
       output.push({ type: 'user', data: el});
     });
+
     res.send(output);
   })
   .catch((err) => {
@@ -220,7 +240,7 @@ app.post('/searchusers', function(req, res) {
   })
   .catch((err) => {
     console.log(err);
-  })
+  });
 });
 
 // Project creation
@@ -237,25 +257,23 @@ app.post('/createproject', function(req, res) {
     const owners = [];
     owners.push([results.insertId, req.user.id, req.user.displayName]);
     const collabRows = req.body.collab.map((el) => {
-      return [
-        results.insertId,
-        el.id,
-        el.name
-      ]
+      return [results.insertId, el.id, el.name];
     });
     owners.push(...collabRows)
-    utils.paramQuery('INSERT INTO projectsUsers VALUES ?', [owners]);
+    utils.paramQuery('INSERT INTO projectsUsers VALUES ?', [owners])
+    .catch((err) => {
+      console.log(err);
+    });
 
     const progressRows = req.body.progress.map((el) => {
-      return [
-        results.insertId,
-        req.user.displayName,
-        'Prior',
-        el
-      ]
+      return [results.insertId, req.user.displayName, 'Prior', el];
     });
-    utils.paramQuery('INSERT INTO updates (fkProjectId, fkUserName, timeStamp, content) VALUES ?', [progressRows]);
+    utils.paramQuery('INSERT INTO updates (fkProjectId, fkUserName, timeStamp, content) VALUES ?', [progressRows])
+    .catch((err) => {
+      console.log(err);
+    });
 
+    console.log(`Project with id ${results.insertId} created`);
     res.send({ redirect: `/project/${results.insertId}` });
   })
   .catch((err) => {
@@ -268,43 +286,43 @@ app.post('/deleteproject', function(req, res) {
   Promise.all([
     utils.paramQuery('DELETE FROM projects WHERE projectId = ?', req.body.projectId),
     utils.paramQuery('DELETE FROM updates WHERE fkProjectId = ?', req.body.projectId),
-    utils.paramQuery('DELETE FROM projectComments WHERE fkProjectId = ?', req.body.projectId),
+    utils.paramQuery('DELETE FROM comments WHERE fkProjectId = ?', req.body.projectId),
     utils.paramQuery('DELETE FROM projectsUsers WHERE fkProjectId = ?', req.body.projectId),
   ])
   .then((results) => {
-    console.log('Successful project deletion');
+    console.log(`Project with id ${req.body.projectId} deleted`);
     res.send('success');
   })
   .catch((err) => {
     console.log(err);
     res.send('error');
-  })
+  });
 });
 
 // Update deletion
 app.post('/deleteupdate', function(req, res) {
   utils.paramQuery('DELETE FROM updates WHERE updateId = ?', req.body.updateId)
   .then((results) => {
-    console.log('Successful update deletion');
+    console.log(`Update with id ${req.body.updateId} deleted`);
     res.send('success');
   })
   .catch((err) => {
     console.log(err);
     res.send('error');
-  })
+  });
 });
 
 // Project name change
 app.post('/changename', function(req, res) {
   utils.paramQuery('UPDATE projects SET name = ? WHERE projectId = ?', [req.body.newName, req.body.projectId])
   .then((results) => {
-    console.log('Successful name change');
+    console.log(`Project with id ${req.body.projectId} changed name`);
     res.send('success');
   })
   .catch((err) => {
     console.log(err);
     res.send('error');
-  })
+  });
 });
 
 // Project name change
@@ -314,22 +332,18 @@ app.post('/changeowner', function(req, res) {
     const owners = [];
     owners.push([req.body.projectId, req.user.id, req.user.displayName]);
     const collabRows = req.body.collab.map((el) => {
-      return [
-        req.body.projectId,
-        el.id,
-        el.name
-      ]
+      return [req.body.projectId, el.id, el.name];
     });
     owners.push(...collabRows);
     utils.paramQuery('INSERT INTO projectsUsers (fkProjectId, fkUserId, fkUserName) VALUES ?', [owners])
     .then((results) => {
-      console.log('Successful owner change');
+      console.log(`Project with id ${req.body.projectId} changed owners`);
       res.send('success');
     })
     .catch((err) => {
       console.log(err);
       res.send('error');
-    })
+    });
   })
   .catch((err) => {
     console.log(err);
@@ -340,26 +354,26 @@ app.post('/changeowner', function(req, res) {
 app.post('/changedesc', function(req, res) {
   utils.paramQuery('UPDATE projects SET description = ? WHERE projectId = ?', [req.body.newDesc, req.body.projectId])
   .then((results) => {
-    console.log('Successful deadline change');
+    console.log(`Project with id ${req.body.projectId} changed description`);
     res.send('success');
   })
   .catch((err) => {
     console.log(err);
     res.send('error');
-  })
+  });
 });
 
 // Project deadline change
 app.post('/changedeadline', function(req, res) {
   utils.paramQuery('UPDATE projects SET deadline = ? WHERE projectId = ?', [req.body.newDeadline, req.body.projectId])
   .then((results) => {
-    console.log('Successful description change');
+    console.log(`Project with id ${req.body.projectId} changed deadline`);
     res.send('success');
   })
   .catch((err) => {
     console.log(err);
     res.send('error');
-  })
+  });
 });
 
 // Project update posting
@@ -370,19 +384,21 @@ app.post('/postupdate', function(req, res) {
     fkUserName: req.user.displayName,
     timeStamp,
     content: req.body.content,
-  }
+  };
   utils.paramQuery('INSERT INTO updates SET ?', values)
   .then((results) => {
+    console.log(`Update posted on project ${req.body.projectId}`);
     res.send('success');
   })
   .catch((err) => {
     console.log(err);
+    res.send('error');
   });
 });
 
 
 // Project comment posting
-app.post('/postprojectcomment', function(req, res) {
+app.post('/postcomment', function(req, res) {
   // const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
   const timeStamp = new Date().toLocaleString('en-US');
   const values = {
@@ -390,14 +406,17 @@ app.post('/postprojectcomment', function(req, res) {
     fkUserName: req.user.displayName,
     fkUserId: req.user.id,
     timeStamp,
-    comment: req.body.projectComment,
-  }
-  utils.paramQuery('INSERT INTO projectComments SET ?', values)
+    comment: req.body.comment,
+    parent: req.body.commentId
+  };
+  utils.paramQuery('INSERT INTO comments SET ?', values)
   .then((results) => {
+    console.log(`Comment posted on project ${req.body.projectId}`);
     res.send('success');
   })
   .catch((err) => {
     console.log(err);
+    res.send('error');
   });
 });
 
